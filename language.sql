@@ -90,3 +90,30 @@ BEGIN
 END;
 $$ STRICT
 LANGUAGE plpgsql IMMUTABLE;
+
+
+CREATE OR REPLACE FUNCTION merge_wiki_names(tags hstore) RETURNS hstore AS $$
+DECLARE
+  result hstore;
+BEGIN
+
+  IF (tags ? 'wikidata') THEN
+    select INTO result
+    CASE
+      WHEN avals(wd.labels) && avals(tags)
+        THEN slice_language_tags(wd.labels) || tags
+      ELSE tags
+    END
+    FROM wd_names wd
+    WHERE wd.id = tags->'wikidata';
+    IF result IS NULL THEN
+      result := tags;
+    END IF;
+  ELSE
+    result := tags;
+  END IF;
+
+  RETURN result;
+END;
+$$ STRICT
+LANGUAGE plpgsql IMMUTABLE;
