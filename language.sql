@@ -97,7 +97,7 @@ DECLARE
   result hstore;
 BEGIN
 
-  IF (tags ? 'wikidata') THEN
+  IF (tags ? 'wikidata' OR tags ? 'wikipedia') THEN
     select INTO result
     CASE
       WHEN avals(wd.labels) && avals(tags)
@@ -105,7 +105,7 @@ BEGIN
       ELSE tags
     END
     FROM wd_names wd
-    WHERE wd.id = tags->'wikidata';
+    WHERE wd.id = tags->'wikidata' OR wd.page = tags->'wikipedia';
     IF result IS NULL THEN
       result := tags;
     END IF;
