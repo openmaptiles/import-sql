@@ -119,12 +119,12 @@ $$ STRICT
 LANGUAGE plpgsql IMMUTABLE;
 
 
-CREATE OR REPLACE FUNCTION update_language_tags(tags hstore, geometry
+CREATE OR REPLACE FUNCTION update_tags(tags hstore, geometry
   geometry) RETURNS hstore AS $$
 DECLARE
   result hstore;
 BEGIN
-  result := slice_language_tags(tags) || get_basic_names(tags, geometry);
+  result := delete_empty_keys(tags) || get_basic_names(tags, geometry);
   result := merge_wiki_names(result);
   RETURN result;
 END;
